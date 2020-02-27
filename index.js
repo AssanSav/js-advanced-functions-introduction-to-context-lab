@@ -38,11 +38,9 @@ function createTimeOutEvent(employeeRecord, dateString) {
 
 function hoursWorkedOnDate(employeeRecord, dateString) {
   let hoursWorked; 
-  if (employeeRecord.timeInEvents[0].date === dateString) {
-    let timeIn = employeeRecord.timeInEvents[0].hour
-    let timeOut = employeeRecord.timeOutEvents[0].hour
-    hoursWorked = (timeOut - timeIn)/100
-  }
+    let timeIn = employeeRecord.timeInEvents.find(record => record.date === dateString)
+    let timeOut = employeeRecord.timeOutEvents.find(record => record.date === dateString)
+    hoursWorked = (timeOut.hour - timeIn.hour)/100
   return hoursWorked
 }
 
@@ -53,15 +51,23 @@ function wagesEarnedOnDate(employeeRecord, dateString) {
 }
 
 function allWagesFor(employeeRecord) {
-  const reducer = (accumulator, currentValue) => accumulator + currentValue; // function to get passed to reduce callback 
-  let workedDates = employeeRecord.timeInEvents.map(obj => obj.date) // return an array of two date elements
+  const reducer = (accumulator, currentValue) => accumulator + currentValue;
+  let workedDates = employeeRecord.timeInEvents.map(obj => obj.date) 
   let payable = []; 
-  console.log(workedDates)
   for (let i = 0; i < workedDates.length; i++){
-    payable.push(wagesEarnedOnDate(employeeRecord, workedDates[i])) // only one date gets passed in
-    console.log(i, wagesEarnedOnDate(employeeRecord, workedDates[i]))
+    payable.push(wagesEarnedOnDate(employeeRecord, workedDates[i])) 
   }
-  return payable.reduce(reducer, 0) // return a single value
+  return payable.reduce(reducer, 0)
+}
 
-  // return employeeRecord.timeInEvents.reduce(reducer, 0)
+function findEmployeeByFirstName(srcArray, firstNameString) {
+  console.log(srcArray.find(record => record.firstName === firstNameString))
+  return srcArray.find(record => record.firstName === firstNameString)
+}
+
+function calculatePayroll(employeesRecord) {
+  let payRolls = employeesRecord.reduce(function (acc, employee) {
+    return acc + allWagesFor(employee)
+  }, 0)
+  return payRolls
 }
